@@ -241,5 +241,13 @@ int Students::getTotalClasses(const int& subject) const{
 }
 
 int Students::getAttendedClasses(const int& subject) const{
-    return (getTotalClasses(subject)*getpercent(subject))/100;
+    int attended = 0;
+    for(int i = 0; i < subject_attendance[subject-1].second.size(); i++)
+    {
+        if(subject_attendance[subject-1].second[i].second == "p")
+        {
+            attended++;
+        }
+    }
+    return attended;
 }
