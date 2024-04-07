@@ -25,6 +25,8 @@ public:
     bool changepass(const std::string &);
     std::vector<combine<Date, std::string>> getAttendance(const int &) const;
     double getpercent(const int &) const;
+    int getTotalClasses(const int&) const;
+    int getAttendedClasses(const int&) const;
 };
 
 Students::~Students()
@@ -232,4 +234,12 @@ void Students::loadAttendance()
         subject_attendance.push_back(subjectRecord);
         instream.close();
     }
+}
+
+int Students::getTotalClasses(const int& subject) const{
+    return subject_attendance[subject-1].second.size();
+}
+
+int Students::getAttendedClasses(const int& subject) const{
+    return (getTotalClasses(subject)*getpercent(subject))/100;
 }
