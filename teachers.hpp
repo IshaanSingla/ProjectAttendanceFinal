@@ -2,31 +2,29 @@
 #include <vector>
 #include <fstream>
 #include "common.hpp"
-
-class Teachers
+#include <iomanip>
+class Teachers:public User
 {
 private:
-    std::string username;
-    std::string password;
-    bool loggedIn;
-    std::vector<combine<std::string, std::string>> Subject_Codes;
-    std::vector<combine<std::string,std::vector<combine<std::string,std::vector<combine<Date,std::string>>>>>> attendance;
+    std::vector<combine<std::string, std::vector<combine<std::string, std::vector<combine<Date, std::string>>>>>> attendance;
     bool check_username(const std::string &);
     bool check_password(const std::string &);
     void loadSubjects();
     void loadAttendance();
+    void update();
+
 public:
-    Teachers() : username(""), password(""), loggedIn(false) {}
     ~Teachers();
     void logout();
     bool loguser(const std::string &, const std::string &);
-    std::vector<std::string> getSubjects() const;
     bool changepass(const std::string &);
     std::vector<std::string> getSubjects();
-    std::vector<std::string> getStudents(const int&);
-    std::vector<double> getpercent(const int&);
-    std::vector<combine<Date,std::string>> getStudentAttendance(const int&,const int&);
-};  
+    std::vector<std::string> getStudents(const int &);
+    std::vector<double> getpercent(const int &);
+    std::vector<combine<Date, std::string>> getStudentAttendance(const int &, const int &);
+    void setPresentAttendance(Date date, int subject, std::vector<int> studentList);
+    void setAbsentAttendance(Date date, int subject, std::vector<int> studentList);
+};
 
 Teachers::~Teachers()
 {
@@ -35,6 +33,7 @@ Teachers::~Teachers()
 
 void Teachers::logout()
 {
+    update();
     username.clear();
     password.clear();
     loggedIn = false;
@@ -124,16 +123,6 @@ void Teachers::loadSubjects()
     loadAttendance();
 }
 
-std::vector<std::string> Teachers::getSubjects() const
-{
-    std::vector<std::string> subjects;
-    for (int i = 0; i < Subject_Codes.size(); i++)
-    {
-        subjects.push_back(Subject_Codes[i].first);
-    }
-    return subjects;
-}
-
 bool Teachers::changepass(const std::string &newpass)
 {
     if (!loggedIn)
@@ -180,25 +169,25 @@ bool Teachers::changepass(const std::string &newpass)
 
 void Teachers::loadAttendance()
 {
-    for(int i = 0; i < Subject_Codes.size();i++)
+    for (int i = 0; i < Subject_Codes.size(); i++)
     {
         std::string code = Subject_Codes[i].second;
         std::ifstream instream;
-        instream.open(code+".slis");
+        instream.open(code + ".slis");
         std::string student;
-        std::vector<combine<std::string,std::vector<combine<Date,std::string>>>> stud_attendance_record;
-        while(std::getline(instream,student))
+        std::vector<combine<std::string, std::vector<combine<Date, std::string>>>> stud_attendance_record;
+        while (std::getline(instream, student))
         {
-            combine<std::string,std::vector<combine<Date,std::string>>> student_attendance;
-            std::string sub_code = code.substr(0,6);
-            std::ifstream student_stream(student+sub_code+".att");
+            combine<std::string, std::vector<combine<Date, std::string>>> student_attendance;
+            std::string sub_code = code.substr(0, 7);
+            std::ifstream student_stream(student + sub_code + ".att");
             std::string attendance;
-            std::vector<combine<Date,std::string>> temp2;
-            while(std::getline(student_stream,attendance))
+            std::vector<combine<Date, std::string>> temp2;
+            while (std::getline(student_stream, attendance))
             {
-                Date date(attendance.substr(0,8));
-                std::string present_absent = attendance.substr(9,1);
-                combine<Date,std::string> temp1;
+                Date date(attendance.substr(0, 8));
+                std::string present_absent = std::string(1,attendance[9]);
+                combine<Date, std::string> temp1;
                 temp1.first = date;
                 temp1.second = present_absent;
                 temp2.push_back(temp1);
@@ -207,7 +196,7 @@ void Teachers::loadAttendance()
             student_attendance.second = temp2;
             stud_attendance_record.push_back(student_attendance);
         }
-        combine<std::string,std::vector<combine<std::string,std::vector<combine<Date,std::string>>>>> attendance_record;
+        combine<std::string, std::vector<combine<std::string, std::vector<combine<Date, std::string>>>>> attendance_record;
         attendance_record.first = Subject_Codes[i].second;
         attendance_record.second = stud_attendance_record;
         attendance.push_back(attendance_record);
@@ -217,55 +206,134 @@ void Teachers::loadAttendance()
 std::vector<std::string> Teachers::getSubjects()
 {
     std::vector<std::string> subjectList;
-    for(int i = 0;i<Subject_Codes.size();i++)
+    for (int i = 0; i < Subject_Codes.size(); i++)
     {
         subjectList.push_back(Subject_Codes[i].first);
     }
     return subjectList;
 }
 
-std::vector<std::string> Teachers::getStudents(const int& subject_choice)
+std::vector<std::string> Teachers::getStudents(const int &subject_choice)
 {
     std::vector<std::string> studentlist;
-    for(int i = 0; i<attendance[subject_choice-1].second.size();i++)
+    for (int i = 0; i < attendance[subject_choice - 1].second.size(); i++)
     {
-        studentlist.push_back(attendance[subject_choice-1].second[i].first);
+        studentlist.push_back(attendance[subject_choice - 1].second[i].first);
     }
     return studentlist;
 }
 
-
-std::vector<double> Teachers::getpercent(const int& subject_choice)
+std::vector<double> Teachers::getpercent(const int &subject_choice)
 {
     std::vector<double> percentlist;
-    for(int i = 0; i<attendance[subject_choice-1].second.size();i++)
+    for (int i = 0; i < attendance[subject_choice - 1].second.size(); i++)
     {
-        double total = attendance[subject_choice-1].second[i].second.size();
+        double total = attendance[subject_choice - 1].second[i].second.size();
         double present = 0;
-        for(int j = 0; j<total;j++)
+        for (int j = 0; j < total; j++)
         {
-            if(attendance[subject_choice-1].second[i].second[j].second == "p")
+            if (attendance[subject_choice - 1].second[i].second[j].second == "p")
             {
                 present++;
             }
         }
 
-        double percent = present/total * 100;
+        double percent = present / total * 100;
         percentlist.push_back(percent);
     }
 
     return percentlist;
 }
 
-std::vector<combine<Date,std::string>> Teachers::getStudentAttendance(const int& subject_choice,const int& student_choice)
+std::vector<combine<Date, std::string>> Teachers::getStudentAttendance(const int &subject_choice, const int &student_choice)
 {
-    std::vector<combine<Date,std::string>> AttendanceList;
-    combine<Date,std::string> temp;
-    for(int i = 0; i < attendance[subject_choice-1].second[student_choice-1].second.size();i++)
+    std::vector<combine<Date, std::string>> AttendanceList;
+    combine<Date, std::string> temp;
+    for (int i = 0; i < attendance[subject_choice - 1].second[student_choice - 1].second.size(); i++)
     {
-        temp.first = attendance[subject_choice-1].second[student_choice-1].second[i].first;
-        temp.second = attendance[subject_choice-1].second[student_choice-1].second[i].second;
+        temp.first = attendance[subject_choice - 1].second[student_choice - 1].second[i].first;
+        temp.second = attendance[subject_choice - 1].second[student_choice - 1].second[i].second;
         AttendanceList.push_back(temp);
     }
     return AttendanceList;
+}
+
+void Teachers::setPresentAttendance(Date date, int subject, std::vector<int> studentList)
+{
+
+    for (int i = 0; i < attendance[subject - 1].second.size(); i++)
+    {
+        bool flag = false;
+        for (int j = 0; j < studentList.size(); j++)
+        {
+            if((studentList[j]-1) == i)
+                flag = true;
+        }
+        if (flag)
+            {
+                combine<Date, std::string> attendance_student;
+                attendance_student.first = date;
+                attendance_student.second = "p"; 
+                attendance[subject - 1].second[i].second.push_back(attendance_student);
+            }
+            else
+            {
+                combine<Date, std::string> attendance_student;
+                attendance_student.first = date;
+                attendance_student.second = "a";
+                attendance[subject - 1].second[i].second.push_back(attendance_student);
+            }
+    }
+}
+
+void Teachers::setAbsentAttendance(Date date, int subject, std::vector<int> studentList)
+{
+
+    for (int i = 0; i < attendance[subject - 1].second.size(); i++)
+    {
+        bool flag = false;
+        for (int j = 0; j < studentList.size(); j++)
+        {
+            if((studentList[j]-1) == i)
+                flag = true;
+        }
+        if (flag)
+            {
+                combine<Date, std::string> attendance_student;
+                attendance_student.first = date;
+                attendance_student.second = "p"; 
+                attendance[subject - 1].second[i].second.push_back(attendance_student);
+            }
+            else
+            {
+                combine<Date, std::string> attendance_student;
+                attendance_student.first = date;
+                attendance_student.second = "a";
+                attendance[subject - 1].second[i].second.push_back(attendance_student);
+            }
+    }
+}
+
+void Teachers::update()
+{
+    std::ofstream outstream;
+    for (int i = 0; i < attendance.size(); i++)
+    {
+        for (int j = 0; j < attendance[i].second.size(); j++)
+        {
+            outstream.open(attendance[i].second[j].first +attendance[i].first.substr(0,7) +  ".att", std::ios::out);
+            for (int k = 0; k < attendance[i].second[j].second.size(); k++)
+            {
+                outstream << std::setw(2) << std::setfill('0')<<attendance[i].second[j].second[k].first.getDay()
+                          << "-"
+                          << std::setw(2) << std::setfill('0')<<attendance[i].second[j].second[k].first.getMonth()
+                          << "-"
+                          << std::setw(2) << std::setfill('0')<<attendance[i].second[j].second[k].first.getYear()
+                          << "-"
+                          << attendance[i].second[j].second[k].second
+                          << std::endl;
+            }
+            outstream.close();
+        }
+    }
 }

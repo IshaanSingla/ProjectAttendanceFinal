@@ -3,12 +3,10 @@
 #include <fstream>
 #include "common.hpp"
 
-class Students
+class Students:public User
 {
 private:
-    std::string username;
-    std::string password;
-    bool loggedIn;
+    
     std::vector<combine<std::string, std::string>> Subject_Codes;
     std::vector<combine<combine<std::string, double>, std::vector<combine<Date, std::string>>>> subject_attendance;
     bool check_username(const std::string &);
@@ -17,11 +15,9 @@ private:
     void loadAttendance();
 
 public:
-    Students() : username(""), password(""), loggedIn(false) {}
     ~Students();
     void logout();
     bool loguser(const std::string &, const std::string &);
-    std::vector<std::string> getSubjects() const;
     bool changepass(const std::string &);
     std::vector<combine<Date, std::string>> getAttendance(const int &) const;
     double getpercent(const int &) const;
@@ -123,16 +119,6 @@ void Students::loadSubjects()
     }
     instream.close();
     loadAttendance();
-}
-
-std::vector<std::string> Students::getSubjects() const
-{
-    std::vector<std::string> subjects;
-    for (int i = 0; i < Subject_Codes.size(); i++)
-    {
-        subjects.push_back(Subject_Codes[i].first);
-    }
-    return subjects;
 }
 
 bool Students::changepass(const std::string &newpass)
