@@ -80,19 +80,9 @@ protected:
     std::vector<combine<std::string, std::string>> Subject_Codes;
 public:
     User(): username(""),password(""),loggedIn(false) {}
-    std::vector<std::string> getSubjects() const;
     
 };
 
-std::vector<std::string> User::getSubjects() const
-{
-    std::vector<std::string> subjects;
-    for (int i = 0; i < Subject_Codes.size(); i++)
-    {
-        subjects.push_back(Subject_Codes[i].first);
-    }
-    return subjects;
-}
 
 
 #endif
