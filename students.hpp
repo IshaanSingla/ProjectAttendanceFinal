@@ -19,6 +19,7 @@ public:
     void logout();
     bool loguser(const std::string &, const std::string &);
     bool changepass(const std::string &);
+    std::vector<std::string> getSubjects() const;
     std::vector<combine<Date, std::string>> getAttendance(const int &) const;
     double getpercent(const int &) const;
     int getTotalClasses(const int&) const;
@@ -119,6 +120,16 @@ void Students::loadSubjects()
     }
     instream.close();
     loadAttendance();
+}
+
+std::vector<std::string> Students::getSubjects() const
+{
+    std::vector<std::string> subjects;
+    for (int i = 0; i < Subject_Codes.size(); i++)
+    {
+        subjects.push_back(Subject_Codes[i].first);
+    }
+    return subjects;
 }
 
 bool Students::changepass(const std::string &newpass)
