@@ -219,12 +219,29 @@ std::vector<std::string> Teachers::getSubjects()
 
 std::vector<std::string> Teachers::getStudents(const int &subject_choice)
 {
-    std::vector<std::string> studentlist;
-    for (int i = 0; i < attendance[subject_choice - 1].second.size(); i++)
+    std::vector<std::string> studentList;
+    std::ifstream instream;
+    for(int i = 0; i < attendance[subject_choice-1].second.size();i++)
     {
-        studentlist.push_back(attendance[subject_choice - 1].second[i].first);
+        instream.open("student.det");
+        bool flag = false;
+        std::string line;
+        while(std::getline(instream,line))
+        {
+            if(line == attendance[subject_choice-1].second[i].first)
+            {
+                flag = true;
+                std::getline(instream,line);
+                break;
+            }
+            std::getline(instream,line);
+        }
+    
+        studentList.push_back(line);
+        instream.close();
+
     }
-    return studentlist;
+    return studentList;
 }
 
 std::vector<double> Teachers::getpercent(const int &subject_choice)
