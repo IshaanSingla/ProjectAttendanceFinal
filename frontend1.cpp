@@ -463,7 +463,7 @@ void teacher_menu(int TableWidth, char borderChar, char intersectionChar)
     case 4:
         std::cout << "\033[0;31m" << std::endl;
         printRow(TableWidth, "-----------------------LOGGED OUT-----------------------", false);
-        std::cout << "\033[0;0m" << std::endl;
+        std::cout << "\033[0m" << std::endl;
         exit(EXIT_SUCCESS);
 
     default:
