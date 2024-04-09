@@ -3,9 +3,10 @@
 #include <fstream>
 #include "common.hpp"
 #include <iomanip>
-class Teachers:public User
+class Teachers : public User
 {
 private:
+    std::vector<combine<std::string, std::string>> Subject_Codes;
     std::vector<combine<std::string, std::vector<combine<std::string, std::vector<combine<Date, std::string>>>>>> attendance;
     bool check_username(const std::string &);
     bool check_password(const std::string &);
@@ -24,6 +25,9 @@ public:
     std::vector<combine<Date, std::string>> getStudentAttendance(const int &, const int &);
     void setPresentAttendance(Date date, int subject, std::vector<int> studentList);
     void setAbsentAttendance(Date date, int subject, std::vector<int> studentList);
+    bool dateExist(Date date, int subject);
+    int getTotalClasses(const int &);
+    int getAttendedClasses(const int &, const int &);
 };
 
 Teachers::~Teachers()
@@ -186,7 +190,7 @@ void Teachers::loadAttendance()
             while (std::getline(student_stream, attendance))
             {
                 Date date(attendance.substr(0, 8));
-                std::string present_absent = std::string(1,attendance[9]);
+                std::string present_absent = std::string(1, attendance[9]);
                 combine<Date, std::string> temp1;
                 temp1.first = date;
                 temp1.second = present_absent;
@@ -266,23 +270,23 @@ void Teachers::setPresentAttendance(Date date, int subject, std::vector<int> stu
         bool flag = false;
         for (int j = 0; j < studentList.size(); j++)
         {
-            if((studentList[j]-1) == i)
+            if ((studentList[j] - 1) == i)
                 flag = true;
         }
         if (flag)
-            {
-                combine<Date, std::string> attendance_student;
-                attendance_student.first = date;
-                attendance_student.second = "p"; 
-                attendance[subject - 1].second[i].second.push_back(attendance_student);
-            }
-            else
-            {
-                combine<Date, std::string> attendance_student;
-                attendance_student.first = date;
-                attendance_student.second = "a";
-                attendance[subject - 1].second[i].second.push_back(attendance_student);
-            }
+        {
+            combine<Date, std::string> attendance_student;
+            attendance_student.first = date;
+            attendance_student.second = "p";
+            attendance[subject - 1].second[i].second.push_back(attendance_student);
+        }
+        else
+        {
+            combine<Date, std::string> attendance_student;
+            attendance_student.first = date;
+            attendance_student.second = "a";
+            attendance[subject - 1].second[i].second.push_back(attendance_student);
+        }
     }
 }
 
@@ -294,23 +298,23 @@ void Teachers::setAbsentAttendance(Date date, int subject, std::vector<int> stud
         bool flag = false;
         for (int j = 0; j < studentList.size(); j++)
         {
-            if((studentList[j]-1) == i)
+            if ((studentList[j] - 1) == i)
                 flag = true;
         }
         if (flag)
-            {
-                combine<Date, std::string> attendance_student;
-                attendance_student.first = date;
-                attendance_student.second = "p"; 
-                attendance[subject - 1].second[i].second.push_back(attendance_student);
-            }
-            else
-            {
-                combine<Date, std::string> attendance_student;
-                attendance_student.first = date;
-                attendance_student.second = "a";
-                attendance[subject - 1].second[i].second.push_back(attendance_student);
-            }
+        {
+            combine<Date, std::string> attendance_student;
+            attendance_student.first = date;
+            attendance_student.second = "p";
+            attendance[subject - 1].second[i].second.push_back(attendance_student);
+        }
+        else
+        {
+            combine<Date, std::string> attendance_student;
+            attendance_student.first = date;
+            attendance_student.second = "a";
+            attendance[subject - 1].second[i].second.push_back(attendance_student);
+        }
     }
 }
 
@@ -321,14 +325,14 @@ void Teachers::update()
     {
         for (int j = 0; j < attendance[i].second.size(); j++)
         {
-            outstream.open(attendance[i].second[j].first +attendance[i].first.substr(0,7) +  ".att", std::ios::out);
+            outstream.open(attendance[i].second[j].first + attendance[i].first.substr(0, 7) + ".att", std::ios::out);
             for (int k = 0; k < attendance[i].second[j].second.size(); k++)
             {
-                outstream << std::setw(2) << std::setfill('0')<<attendance[i].second[j].second[k].first.getDay()
+                outstream << std::setw(2) << std::setfill('0') << attendance[i].second[j].second[k].first.getDay()
                           << "-"
-                          << std::setw(2) << std::setfill('0')<<attendance[i].second[j].second[k].first.getMonth()
+                          << std::setw(2) << std::setfill('0') << attendance[i].second[j].second[k].first.getMonth()
                           << "-"
-                          << std::setw(2) << std::setfill('0')<<attendance[i].second[j].second[k].first.getYear()
+                          << std::setw(2) << std::setfill('0') << attendance[i].second[j].second[k].first.getYear()
                           << "-"
                           << attendance[i].second[j].second[k].second
                           << std::endl;
@@ -336,4 +340,32 @@ void Teachers::update()
             outstream.close();
         }
     }
+}
+
+bool Teachers::dateExist(Date date, int subject)
+{
+    for (int i = 0; i < attendance[subject - 1].second[0].second.size(); i++)
+    {
+        if (date == attendance[subject - 1].second[0].second[i].first)
+            return 1;
+        else
+            continue;
+    }
+    return 0;
+}
+
+int Teachers::getTotalClasses(const int &subject)
+{
+    return attendance[subject - 1].second[0].second.size();
+}
+
+int Teachers::getAttendedClasses(const int &subject, const int &student)
+{
+    int count = 0;
+    for (int i = 0; i < attendance[subject - 1].second[0].second.size(); i++)
+    {
+        if (attendance[subject - 1].second[0].second[i].second == "p")
+            count++;
+    }
+    return count;
 }
