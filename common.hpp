@@ -64,6 +64,11 @@ public:
         int daysInMonth = this->daysInMonth();
         return day <= daysInMonth;
     }
+
+    bool operator==(Date obj)
+    {
+        return (this->day == obj.day)&&(this->month == obj.month)&&(this->year == obj.year);
+    }
 };
 template <typename T, typename U>
 struct combine
@@ -77,7 +82,6 @@ protected:
     std::string username;
     std::string password;
     bool loggedIn;
-    std::vector<combine<std::string, std::string>> Subject_Codes;
 public:
     User(): username(""),password(""),loggedIn(false) {}
     
