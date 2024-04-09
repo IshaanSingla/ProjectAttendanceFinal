@@ -449,8 +449,6 @@ void teacher_menu(int TableWidth, char borderChar, char intersectionChar)
             system("cls");
             std::cout << "\033[0;32m" << std::endl;
             printRow(TableWidth, "Password changed successfully!", false);
-             std::cout << "\033[0m" << std::endl;
-            std::vector<std::string> subjects = t1.getSubjects();
             subject_list_teacher(100, '-', '+', subjects, t1);
             teacher_menu(61, '-', '+');
         }
