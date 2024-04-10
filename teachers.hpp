@@ -322,14 +322,14 @@ void Teachers::setAbsentAttendance(Date date, int subject, std::vector<int> stud
         {
             combine<Date, std::string> attendance_student;
             attendance_student.first = date;
-            attendance_student.second = "p";
+            attendance_student.second = "a";
             attendance[subject - 1].second[i].second.push_back(attendance_student);
         }
         else
         {
             combine<Date, std::string> attendance_student;
             attendance_student.first = date;
-            attendance_student.second = "a";
+            attendance_student.second = "p";
             attendance[subject - 1].second[i].second.push_back(attendance_student);
         }
     }
@@ -381,7 +381,7 @@ int Teachers::getAttendedClasses(const int &subject, const int &student)
     int count = 0;
     for (int i = 0; i < attendance[subject - 1].second[0].second.size(); i++)
     {
-        if (attendance[subject - 1].second[0].second[i].second == "p")
+        if (attendance[subject - 1].second[student-1].second[i].second == "p")
             count++;
     }
     return count;

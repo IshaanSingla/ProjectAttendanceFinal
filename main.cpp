@@ -273,9 +273,7 @@ bool log_in_teacher(int TableWidth, char borderChar, char intersectionChar, Teac
         is_logged_in = log_in_teacher(51, '-', '+', t1);
         if (is_logged_in == true)
         {
-            std::vector<std::string> subjects = t1.getSubjects();
-            subject_list_teacher(60, '-', '+', subjects, t1);
-            menu(61, '-', '+');
+            teacher_menu(61, '-', '+');
         }
         return false;
     }
@@ -453,8 +451,7 @@ void teacher_menu(int TableWidth, char borderChar, char intersectionChar)
             system("cls");
             std::cout << "\033[0;32m" << std::endl;
             printRow(TableWidth, "Password changed successfully!", false);
-            std::vector<std::string> subjects = t1.getSubjects();
-            subject_list_teacher(100, '-', '+', subjects, t1);
+            std::cout << "\033[0m" << std::endl;
             teacher_menu(61, '-', '+');
         }
 
